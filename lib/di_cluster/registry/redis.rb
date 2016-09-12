@@ -12,15 +12,17 @@ module DiCluster
       end
 
       def nodes
-        nodes = keys('nodes')
-        nodes.each do |node|
-          unregister(node) if Time.at(node(node)['ttl']) < Time.now
-        end
-        nodes
+        nodes_cleanup
+        keys('nodes')
       end
 
       def nodes_with_role(role_name)
         Hash[all('nodes').map { |k, v| [k, MessagePack.unpack(v)] }].select { |k,v| v["roles"].include?(role_name) }
+      end
+
+      def nodes_cleanup
+        nodes = keys('nodes')
+        nodes.each { |node| unregister(node) if node(node)['ttl'] < Time.now.to_i }
       end
 
       def node(node_name)
