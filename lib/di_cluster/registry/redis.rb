@@ -17,6 +17,7 @@ module DiCluster
       end
 
       def nodes_with_role(role_name)
+        nodes_cleanup
         Hash[all('nodes').map { |k, v| [k, MessagePack.unpack(v)] }].select { |k,v| v["roles"].include?(role_name) }
       end
 
